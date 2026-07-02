@@ -1,0 +1,16 @@
+.DS_Store
+**/.DS_Store
+
+# Local IDE files
+.vscode/
+*.code-workspace
+
+# Large local exports / temporary files
+download.txt
+*.log
+
+# GitHub file size limit guard
+墨生_宣传视频.mov
+
+# Keep nested repository isolated
+Code/.git/
