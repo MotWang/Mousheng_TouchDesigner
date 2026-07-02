@@ -133,14 +133,7 @@
 
 ---
 
-## Contribution Boundary（贡献边界说明）
-
-### Original CLI Author Contribution
-
-- `td-cli` 基础架构与核心命令系统由 **0dot77 (Taeyang Yoo)** 原创
-- 原始仓库与基础能力来源于上游 `td-cli` 项目
-
-### MotWang Contribution（《墨·生》作者）
+## Contribution（MotWang）
 
 - 将 CLI 深度应用于《墨·生》交互装置生产流程，并完成工程化落地
 - 增加/强化面向 Agent 的工作闭环（observe/apply/verify/history/rollback）
@@ -153,6 +146,10 @@
 
 - 本仓库中的 `Code_runtime_cli/` 为《墨·生》项目运行快照与优化集成版本
 - 该目录保留并尊重原 CLI 作者署名，同时明确 Mosheng 项目侧二次开发贡献
+
+## Acknowledgement
+
+- Thanks **0dot77 (Taeyang Yoo)** for the original `td-cli` foundation.
 
 ---
 
