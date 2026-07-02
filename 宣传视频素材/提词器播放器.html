@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>《墨·生》宣传视频 · 提词器播放器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --ink: #23201c;
+    --ink-light: #4a443c;
+    --paper: #f3ecdd;
+    --paper-dark: #e8dcc5;
+    --seal: #b23a2e;
+    --gold: #b8893b;
+    --spring: #6ea05a;
+    --summer: #c85a7a;
+    --autumn: #cf6a2a;
+    --winter: #5f7fa6;
+  }
+  
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(circle at 20% 10%, #fff7e9 0%, transparent 40%),
+      radial-gradient(circle at 85% 90%, #efe4cd 0%, transparent 45%);
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .header {
+    text-align: center;
+    padding: 20px 0 30px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 30px;
+  }
+  
+  .title {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .title .seal {
+    display: inline-block;
+    background: var(--seal);
+    color: #f7eee0;
+    border-radius: 4px;
+    padding: 0 10px;
+    margin-right: 10px;
+    transform: translateY(-2px);
+  }
+  
+  .subtitle {
+    font-size: 14px;
+    color: var(--ink-light);
+    letter-spacing: 2px;
+  }
+  
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+  
+  .panel {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #d9ccae;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  
+  .panel-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d9ccae;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .panel-title .num {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  
+  /* 时间显示 */
+  .time-display {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 300;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    color: var(--ink);
+    padding: 20px 0;
+    letter-spacing: 4px;
+  }
+  
+  .time-display .ms {
+    font-size: 24px;
+    color: var(--ink-light);
+  }
+  
+  /* 播放控制 */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn:hover {
+    background: var(--ink-light);
+  }
+  
+  .btn.primary {
+    background: var(--seal);
+  }
+  
+  .btn.primary:hover {
+    background: #9c3326;
+  }
+  
+  .progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--paper-dark);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: var(--seal);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+  
+  /* 当前段落 */
+  .current-section {
+    text-align: center;
+    padding: 15px;
+    background: rgba(178, 58, 46, 0.1);
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .section-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--seal);
+    margin-bottom: 5px;
+  }
+  
+  .section-speaker {
+    font-size: 14px;
+    color: var(--ink-light);
+  }
+  
+  .section-time {
+    font-size: 13px;
+    color: var(--gold);
+    margin-top: 5px;
+  }
+  
+  /* 台词显示 */
+  .script-display {
+    min-height: 200px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    font-size: 20px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+  
+  .script-line {
+    padding: 4px 0;
+    transition: all 0.3s;
+  }
+  
+  .script-line.active {
+    color: var(--seal);
+    font-weight: 600;
+    font-size: 24px;
+    padding: 8px 0;
+  }
+  
+  /* 时间线 */
+  .timeline {
+    margin-top: 20px;
+  }
+  
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 5px;
+  }
+  
+  .timeline-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  
+  .timeline-item.active {
+    background: rgba(178, 58, 46, 0.15);
+    border-left: 3px solid var(--seal);
+  }
+  
+  .timeline-time {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    color: var(--ink-light);
+    min-width: 50px;
+    padding-top: 2px;
+  }
+  
+  .timeline-content {
+    flex: 1;
+  }
+  
+  .timeline-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+  
+  .timeline-desc {
+    font-size: 12px;
+    color: var(--ink-light);
+    line-height: 1.5;
+  }
+  
+  .speaker-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  
+  .speaker-1 { background: rgba(110, 160, 90, 0.2); color: var(--spring); }
+  .speaker-2 { background: rgba(200, 90, 122, 0.2); color: var(--summer); }
+  .speaker-3 { background: rgba(207, 106, 42, 0.2); color: var(--autumn); }
+  .speaker-4 { background: rgba(95, 127, 166, 0.2); color: var(--winter); }
+  
+  /* 速度控制 */
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .speed-control label {
+    font-size: 13px;
+    color: var(--ink-light);
+  }
+  
+  .speed-btns {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .speed-btn {
+    padding: 5px 10px;
+    border: 1px solid #d9ccae;
+    background: transparent;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--ink-light);
+  }
+  
+  .speed-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  
+  /* 快捷键提示 */
+  .shortcuts {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(184, 137, 59, 0.1);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-light);
+    line-height: 1.8;
+  }
+  
+  .shortcuts kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    background: var(--paper);
+    border: 1px solid #d9ccae;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 11px;
+    margin: 0 2px;
+  }
+  
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--ink-light);
+    font-size: 12px;
+    border-top: 1px solid #d9ccae;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  
+  <div class="header">
+    <div class="title"><span class="seal">墨</span>生 · 宣传视频提词器</div>
+    <div class="subtitle">Interactive Ink Installation · 2分30秒完整版</div>
+  </div>
+  
+  <div class="main-grid">
+    <!-- 左侧：播放控制 + 当前台词 -->
+    <div class="panel">
+      <div class="panel-title"><span class="num">1</span>播放控制</div>
+      
+      <div class="time-display" id="timeDisplay">
+        00:00<span class="ms">.00</span>
+      </div>
+      
+      <div class="current-section" id="currentSection">
+        <div class="section-name">开场</div>
+        <div class="section-speaker">无旁白 · 字幕展示</div>
+        <div class="section-time">0:00 - 0:20</div>
+      </div>
+      
+      <div class="controls">
+        <button class="btn primary" id="playBtn" onclick="togglePlay()">▶ 播放</button>
+        <button class="btn" onclick="resetTime()">⏮ 重置</button>
+        <div class="progress-bar" id="progressBar" onclick="seekProgress(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      
+      <div class="speed-control">
+        <label>播放速度：</label>
+        <div class="speed-btns">
+          <button class="speed-btn" onclick="setSpeed(0.5)">0.5x</button>
+          <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
+          <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+          <button class="speed-btn" onclick="setSpeed(1.25)">1.25x</button>
+          <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
+        </div>
+      </div>
+      
+      <div class="shortcuts">
+        <b>快捷键：</b><br>
+        <kbd>空格</kbd> 播放/暂停 &nbsp;&nbsp;
+        <kbd>R</kbd> 重置 &nbsp;&nbsp;
+        <kbd>←</kbd><kbd>→</kbd> 快退/快进5秒 &nbsp;&nbsp;
+        <kbd>↑</kbd><kbd>↓</kbd> 调整速度
+      </div>
+    </div>
+    
+    <!-- 右侧：当前台词 -->
+    <div class="panel">
+      <div class="panel-title"><span class="num">2</span>当前台词</div>
+      <div class="script-display" id="scriptDisplay">
+        <div class="script-line">点击「播放」开始，这里会显示当前台词...</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 时间线 -->
+  <div class="panel">
+    <div class="panel-title"><span class="num">3</span>完整时间线（点击跳转）</div>
+    <div class="timeline" id="timeline">
+      <!-- 时间线项目由JS生成 -->
+    </div>
+  </div>
+  
+  <div class="footer">
+    《墨·生》交互水墨投影装置 · 宣传视频提词器 v1.0
+  </div>
+</div>
+
+<script>
+// 视频总时长（秒）
+const TOTAL_DURATION = 150; // 2分30秒
+
+// 当前时间（秒）
+let currentTime = 0;
+let isPlaying = false;
+let playSpeed = 1;
+let timer = null;
+
+// 时间线数据
+const timeline = [
+  {
+    start: 0,
+    end: 20,
+    title: "开场",
+    speaker: "无旁白",
+    speakerTag: "",
+    desc: "标题 + 核心理念 + 精彩瞬间快剪",
+    script: [
+      { time: 0, text: "【0:00-0:03】黑场，墨滴落下，晕染出「墨·生」标题" },
+      { time: 3, text: "【0:03-0:08】标题停留，副标题「交互水墨投影装置」" },
+      { time: 8, text: "【0:08-0:15】精彩瞬间快剪：黑白→彩色、四季绽放、观众剪影" },
+      { time: 15, text: "【0:15-0:20】核心理念字幕：「人未动，画为静；人一动，墨生色」" }
+    ]
+  },
+  {
+    start: 20,
+    end: 50,
+    title: "项目立意",
+    speaker: "成员1 · 艺术总监",
+    speakerTag: "speaker-1",
+    desc: "艺术理念与创作灵感（30秒）",
+    script: [
+      { time: 20, text: "大家好，我是《墨·生》的主创。" },
+      { time: 24, text: "这个作品的灵感，来自吴冠中先生说的——" },
+      { time: 28, text: "「动与静，是东方美学的永恒命题」。" },
+      { time: 33, text: "我们想做一件事：让一幅静止的水墨画，" },
+      { time: 37, text: "因为人的存在而活过来。" },
+      { time: 41, text: "人未动时，画是静的，素墨留白，" },
+      { time: 45, text: "像千百年里无人惊扰的山水；" },
+      { time: 48, text: "人一动，墨就生了色，像春天破冰、像墨滴入水——" },
+      { time: 52, text: "你挥过的每一寸，都成了画的一部分。" },
+      { time: 56, text: "这不是屏幕在动，是你在画里留下了痕迹。" }
+    ]
+  },
+  {
+    start: 50,
+    end: 85,
+    title: "技术特点",
+    speaker: "成员2 · 技术负责人",
+    speakerTag: "speaker-2",
+    desc: "交互原理与技术实现（35秒）",
+    script: [
+      { time: 60, text: "我来给大家拆解《墨·生》背后的技术逻辑。" },
+      { time: 65, text: "整套系统基于 TouchDesigner 实时渲染引擎搭建。" },
+      { time: 70, text: "最核心的是三层结构：" },
+      { time: 73, text: "第一层，我们用 Optical Flow 光流算法，" },
+      { time: 77, text: "实时捕捉摄像头前的人体动作，" },
+      { time: 80, text: "把运动轨迹转成黑白蒙版；" },
+      { time: 84, text: "第二层，是双层画面叠加——" },
+      { time: 88, text: "上层是黑白水墨，下层是重彩工笔，" },
+      { time: 92, text: "蒙版在哪里，哪里的彩色就透出来；" },
+      { time: 96, text: "第三层，用 Feedback 反馈循环加模糊，" },
+      { time: 100, text: "模拟墨在宣纸上晕开的那种残留质感。" },
+      { time: 105, text: "所以你看到的不是预设动画，" },
+      { time: 109, text: "是你的每一个动作，在实时生成这幅画。" }
+    ]
+  },
+  {
+    start: 85,
+    end: 105,
+    title: "四季互动 · 春夏篇",
+    speaker: "成员3",
+    speakerTag: "speaker-3",
+    desc: "春季 + 夏季绽放演示（20秒）",
+    script: [
+      { time: 85, text: "当你持续互动，让整幅画完全显色后，" },
+      { time: 89, text: "就会触发当季的「绽放」。" },
+      { time: 93, text: "春天，是柳叶随风飘落，疏朗灵动，" },
+      { time: 97, text: "像江南三月的风；" },
+      { time: 100, text: "夏天，荷瓣从水面缓缓上浮，" },
+      { time: 104, text: "金色辉光从花心漾开，" },
+      { time: 108, text: "是盛夏最热烈的那一刻。" },
+      { time: 112, text: "每一季的绽放，都是这一季最美的瞬间。" }
+    ]
+  },
+  {
+    start: 105,
+    end: 120,
+    title: "四季互动 · 秋冬篇",
+    speaker: "成员4",
+    speakerTag: "speaker-4",
+    desc: "秋季 + 冬季绽放演示 + 总结（15秒）",
+    script: [
+      { time: 105, text: "秋天，红枫漫天飞舞，金尘点点，" },
+      { time: 109, text: "是暮色里的温柔；" },
+      { time: 112, text: "冬天，雪花静静落下，素白渐渐覆盖画面，" },
+      { time: 116, text: "又回到最初的宁静。" },
+      { time: 119, text: "四季轮回，就像一场又一场的相遇。" },
+      { time: 123, text: "你来过，画就记得。" }
+    ]
+  },
+  {
+    start: 120,
+    end: 140,
+    title: "现场布展",
+    speaker: "画外音",
+    speakerTag: "",
+    desc: "展览现场 + 观众体验（20秒）",
+    script: [
+      { time: 120, text: "【2:00-2:05】展览空间全景" },
+      { time: 125, text: "【2:05-2:10】观众互动特写" },
+      { time: 130, text: "《墨·生》，一幅等你来唤醒的画。" },
+      { time: 135, text: "人未动，画为静；" },
+      { time: 138, text: "人一动，墨生色。" }
+    ]
+  },
+  {
+    start: 140,
+    end: 150,
+    title: "结尾",
+    speaker: "字幕",
+    speakerTag: "",
+    desc: "团队信息 + 致谢（10秒）",
+    script: [
+      { time: 140, text: "【2:20-2:25】「墨·生」标题 + 四季轮转叠化" },
+      { time: 145, text: "【2:25-2:28】团队成员名单 / 制作信息" },
+      { time: 148, text: "【2:28-2:30】黑场，余韵" }
+    ]
+  }
+];
+
+// 格式化时间
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 100);
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+}
+
+function formatTimeSimple(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${String(secs).padStart(2, '0')}`;
+}
+
+// 更新时间显示
+function updateTimeDisplay() {
+  document.getElementById('timeDisplay').innerHTML = 
+    formatTime(currentTime).replace('.', '<span class="ms">.') + '</span>';
+  
+  // 更新进度条
+  const progress = (currentTime / TOTAL_DURATION) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  
+  // 更新当前段落
+  updateCurrentSection();
+  
+  // 更新台词
+  updateScript();
+  
+  // 更新时间线高亮
+  updateTimelineHighlight();
+}
+
+// 获取当前段落
+function getCurrentSection() {
+  for (let i = 0; i < timeline.length; i++) {
+    if (currentTime >= timeline[i].start && currentTime < timeline[i].end) {
+      return { section: timeline[i], index: i };
+    }
+  }
+  return { section: timeline[timeline.length - 1], index: timeline.length - 1 };
+}
+
+// 更新当前段落显示
+function updateCurrentSection() {
+  const { section } = getCurrentSection();
+  const speakerTag = section.speakerTag ? 
+    `<span class="speaker-tag ${section.speakerTag}">${section.speaker}</span>` : 
+    section.speaker;
+  
+  document.getElementById('currentSection').innerHTML = `
+    <div class="section-name">${section.title}</div>
+    <div class="section-speaker">${speakerTag}</div>
+    <div class="section-time">${formatTimeSimple(section.start)} - ${formatTimeSimple(section.end)}</div>
+  `;
+}
+
+// 更新台词显示
+function updateScript() {
+  const { section } = getCurrentSection();
+  const script = section.script;
+  
+  // 找到当前台词
+  let currentIndex = 0;
+  for (let i = 0; i < script.length; i++) {
+    if (currentTime >= script[i].time) {
+      currentIndex = i;
+    }
+  }
+  
+  // 显示当前及前后各2句
+  let html = '';
+  const start = Math.max(0, currentIndex - 1);
+  const end = Math.min(script.length, currentIndex + 3);
+  
+  for (let i = start; i < end; i++) {
+    const isActive = i === currentIndex;
+    html += `<div class="script-line ${isActive ? 'active' : ''}">${script[i].text}</div>`;
+  }
+  
+  document.getElementById('scriptDisplay').innerHTML = html;
+}
+
+// 生成时间线
+function generateTimeline() {
+  const container = document.getElementById('timeline');
+  let html = '';
+  
+  timeline.forEach((item, index) => {
+    const speakerTag = item.speakerTag ? 
+      `<span class="speaker-tag ${item.speakerTag}">${item.speaker}</span>` : '';
+    
+    html += `
+      <div class="timeline-item" id="timeline-${index}" onclick="jumpTo(${item.start})">
+        <div class="timeline-time">${formatTimeSimple(item.start)}</div>
+        <div class="timeline-content">
+          <div class="timeline-title">${item.title} ${speakerTag}</div>
+          <div class="timeline-desc">${item.desc}</div>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// 更新时间线高亮
+function updateTimelineHighlight() {
+  const { index } = getCurrentSection();
+  
+  document.querySelectorAll('.timeline-item').forEach((item, i) => {
+    item.classList.toggle('active', i === index);
+  });
+}
+
+// 播放/暂停
+function togglePlay() {
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('playBtn');
+  
+  if (isPlaying) {
+    btn.textContent = '⏸ 暂停';
+    startTimer();
+  } else {
+    btn.textContent = '▶ 播放';
+    stopTimer();
+  }
+}
+
+// 开始计时
+function startTimer() {
+  stopTimer();
+  const interval = 50; // 50ms更新一次
+  
+  timer = setInterval(() => {
+    currentTime += (playSpeed * interval) / 1000;
+    
+    if (currentTime >= TOTAL_DURATION) {
+      currentTime = TOTAL_DURATION;
+      isPlaying = false;
+      document.getElementById('playBtn').textContent = '▶ 播放';
+      stopTimer();
+    }
+    
+    updateTimeDisplay();
+  }, interval);
+}
+
+// 停止计时
+function stopTimer() {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+}
+
+// 重置
+function resetTime() {
+  currentTime = 0;
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶ 播放';
+  stopTimer();
+  updateTimeDisplay();
+}
+
+// 跳转到指定时间
+function jumpTo(seconds) {
+  currentTime = seconds;
+  updateTimeDisplay();
+}
+
+// 点击进度条跳转
+function seekProgress(event) {
+  const bar = document.getElementById('progressBar');
+  const rect = bar.getBoundingClientRect();
+  const percent = (event.clientX - rect.left) / rect.width;
+  currentTime = percent * TOTAL_DURATION;
+  updateTimeDisplay();
+}
+
+// 设置播放速度
+function setSpeed(speed) {
+  playSpeed = speed;
+  
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+}
+
+// 键盘快捷键
+document.addEventListener('keydown', (e) => {
+  switch(e.code) {
+    case 'Space':
+      e.preventDefault();
+      togglePlay();
+      break;
+    case 'KeyR':
+      resetTime();
+      break;
+    case 'ArrowLeft':
+      currentTime = Math.max(0, currentTime - 5);
+      updateTimeDisplay();
+      break;
+    case 'ArrowRight':
+      currentTime = Math.min(TOTAL_DURATION, currentTime + 5);
+      updateTimeDisplay();
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      playSpeed = Math.min(2, playSpeed + 0.25);
+      updateSpeedButtons();
+      break;
+    case 'ArrowDown':
+      e.preventDefault();
+      playSpeed = Math.max(0.25, playSpeed - 0.25);
+      updateSpeedButtons();
+      break;
+  }
+});
+
+function updateSpeedButtons() {
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.toggle('active', parseFloat(btn.textContent) === playSpeed);
+  });
+}
+
+// 初始化
+generateTimeline();
+updateTimeDisplay();
+</script>
+</body>
+</html>

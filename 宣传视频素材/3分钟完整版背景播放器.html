@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>《墨·生》宣传视频 · 3分钟完整版背景播放器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --ink: #23201c;
+    --ink-light: #4a443c;
+    --paper: #f3ecdd;
+    --paper-dark: #e8dcc5;
+    --seal: #b23a2e;
+    --gold: #b8893b;
+  }
+  
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  .main-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* 左侧：背景预览区 */
+  .preview-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    position: relative;
+  }
+  
+  .preview-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .background-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+  }
+  
+  .background-layer.active {
+    opacity: 1;
+  }
+  
+  .background-layer img,
+  .background-layer video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* 现场照片轮播 */
+  .photo-carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .photo-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .photo-item.active {
+    opacity: 1;
+  }
+  
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+  }
+  
+  /* 预览区顶部信息 */
+  .preview-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    z-index: 10;
+  }
+  
+  .time-display {
+    font-size: 28px;
+    font-weight: 300;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    letter-spacing: 2px;
+  }
+  
+  .time-display .ms {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  
+  .section-badge {
+    background: rgba(178, 58, 46, 0.9);
+    color: #f7eee0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: none;
+  }
+  
+  /* 预览区底部：当前台词 */
+  .current-script {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    text-align: center;
+    z-index: 10;
+    transition: opacity 0.5s;
+  }
+  
+  .current-script.hidden {
+    opacity: 0;
+  }
+  
+  .script-text {
+    font-size: 26px;
+    line-height: 1.6;
+    color: #fff;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.95), 0 0 50px rgba(0,0,0,0.6);
+    font-weight: 500;
+    transition: all 0.5s;
+  }
+  
+  .script-text.en {
+    font-size: 16px;
+    opacity: 0.75;
+    margin-top: 6px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  
+  .script-text.next {
+    font-size: 18px;
+    opacity: 0.5;
+    margin-top: 12px;
+  }
+  
+  .script-text.next.en {
+    font-size: 13px;
+    opacity: 0.35;
+    margin-top: 4px;
+  }
+  
+  .speaker-name {
+    font-size: 13px;
+    color: var(--gold);
+    margin-bottom: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  
+  /* 右侧：控制面板 */
+  .control-section {
+    width: 360px;
+    background: rgba(35, 32, 28, 0.97);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .control-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  
+  .control-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--paper);
+  }
+  
+  .control-subtitle {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+  
+  /* 播放控制 */
+  .play-controls {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  
+  .main-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary {
+    background: var(--seal);
+    color: #f7eee0;
+  }
+  
+  .btn-primary:hover {
+    background: #9c3326;
+  }
+  
+  .btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--paper);
+  }
+  
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.12);
+  }
+  
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 11px;
+    flex: none;
+  }
+  
+  .progress-container {
+    margin-bottom: 12px;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: var(--seal);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+  
+  .time-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--ink-light);
+    margin-top: 4px;
+    font-family: monospace;
+  }
+  
+  /* 速度控制 */
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .speed-control label {
+    font-size: 11px;
+    color: var(--ink-light);
+  }
+  
+  .speed-btns {
+    display: flex;
+    gap: 4px;
+  }
+  
+  .speed-btn {
+    padding: 3px 7px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    color: var(--ink-light);
+  }
+  
+  .speed-btn.active {
+    background: var(--seal);
+    color: #f7eee0;
+    border-color: var(--seal);
+  }
+  
+  /* 模式切换 */
+  .mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(184, 137, 59, 0.1);
+    border-radius: 6px;
+    margin-top: 10px;
+  }
+  
+  .mode-toggle label {
+    font-size: 11px;
+    color: var(--gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .mode-toggle input[type="checkbox"] {
+    accent-color: var(--seal);
+  }
+  
+  /* 音量控制 */
+  .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(178, 58, 46, 0.08);
+    border-radius: 6px;
+    margin-top: 8px;
+  }
+  
+  .volume-control label {
+    font-size: 11px;
+    color: var(--gold);
+    min-width: 50px;
+  }
+  
+  .volume-slider {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+  }
+  
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--seal);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .volume-value {
+    font-size: 10px;
+    color: var(--ink-light);
+    min-width: 30px;
+    text-align: right;
+    font-family: monospace;
+  }
+  
+  /* 时间线 */
+  .timeline-section {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 20px;
+  }
+  
+  .timeline-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 3px;
+  }
+  
+  .timeline-item:hover {
+    background: rgba(255,255,255,0.04);
+  }
+  
+  .timeline-item.active {
+    background: rgba(178, 58, 46, 0.15);
+    border-left: 2px solid var(--seal);
+    padding-left: 6px;
+  }
+  
+  .timeline-time {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    min-width: 40px;
+    padding-top: 2px;
+  }
+  
+  .timeline-content {
+    flex: 1;
+  }
+  
+  .timeline-name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  
+  .timeline-desc {
+    font-size: 10px;
+    color: var(--ink-light);
+    line-height: 1.4;
+  }
+  
+  /* 快捷键提示 */
+  .shortcuts {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 10px;
+    color: var(--ink-light);
+    line-height: 1.8;
+  }
+  
+  .shortcuts kbd {
+    display: inline-block;
+    padding: 1px 5px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 9px;
+    margin: 0 2px;
+    color: var(--paper);
+  }
+  
+  /* 提示信息 */
+  .notice {
+    margin: 12px 20px;
+    padding: 10px;
+    background: rgba(184, 137, 59, 0.12);
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--gold);
+  }
+  
+  .notice b {
+    color: #d4a84b;
+  }
+  
+  /* 开场标题动画 */
+  .opening-title {
+    text-align: center;
+    animation: fadeInUp 2s ease-out;
+  }
+  
+  .opening-title .main-title {
+    font-size: 72px;
+    font-weight: 200;
+    letter-spacing: 24px;
+    color: var(--paper);
+    margin-bottom: 20px;
+    text-shadow: 0 0 60px rgba(243, 236, 221, 0.3);
+  }
+  
+  .opening-title .sub-title {
+    font-size: 16px;
+    letter-spacing: 10px;
+    color: var(--gold);
+    opacity: 0.9;
+  }
+  
+  .opening-title .sub-title-en {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-top: 4px;
+  }
+  
+  .opening-title .tagline {
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--ink-light);
+    margin-top: 30px;
+  }
+  
+  .opening-title .tagline-en {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--ink-light);
+    opacity: 0.6;
+    margin-top: 6px;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* 结尾标题 */
+  .ending-title {
+    text-align: center;
+  }
+  
+  .ending-title .main-title {
+    font-size: 56px;
+    font-weight: 200;
+    letter-spacing: 18px;
+    color: var(--paper);
+    margin-bottom: 25px;
+  }
+  
+  .ending-title .sub-title {
+    font-size: 14px;
+    letter-spacing: 6px;
+    color: var(--gold);
+    margin-bottom: 15px;
+  }
+  
+  .ending-title .sub-title-en {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 15px;
+  }
+  
+  .ending-title .team-info {
+    font-size: 12px;
+    color: var(--ink-light);
+    line-height: 2;
+    margin-top: 20px;
+  }
+  
+  /* 滚动条 */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="main-container">
+  
+  <!-- 左侧：背景预览 -->
+  <div class="preview-section">
+    <div class="preview-container" id="previewContainer">
+      
+      <!-- 开场 -->
+      <div class="background-layer active" id="bg-opening">
+        <div class="opening-title">
+          <div class="main-title">墨 · 生</div>
+          <div class="sub-title">交互水墨投影装置</div>
+          <div class="sub-title-en">Interactive Ink Installation</div>
+          <div class="tagline">人未动，画为静；人一动，墨生色</div>
+          <div class="tagline-en">When man is still, the painting is silent; when man moves, ink blooms</div>
+        </div>
+      </div>
+      
+      <!-- 春季黑白 -->
+      <div class="background-layer" id="bg-spring-bw">
+        <img src="./01_图片素材/01_春季_黑白.png" alt="春季黑白">
+      </div>
+      
+      <!-- 春季彩色 -->
+      <div class="background-layer" id="bg-spring-color">
+        <img src="./01_图片素材/02_春季_彩色.png" alt="春季彩色">
+      </div>
+      
+      <!-- 春季绽放视频 -->
+      <div class="background-layer" id="bg-spring-video">
+        <video src="./02_视频素材/01_春季绽放.mp4" loop muted playsinline></video>
+      </div>
+      
+      <!-- 夏季黑白 -->
+      <div class="background-layer" id="bg-summer-bw">
+        <img src="./01_图片素材/03_夏季_黑白.png" alt="夏季黑白">
+      </div>
+      
+      <!-- 夏季彩色 -->
+      <div class="background-layer" id="bg-summer-color">
+        <img src="./01_图片素材/04_夏季_彩色.png" alt="夏季彩色">
+      </div>
+      
+      <!-- 夏季绽放视频 -->
+      <div class="background-layer" id="bg-summer-video">
+        <video src="./02_视频素材/02_夏季绽放.mp4" loop muted playsinline></video>
+      </div>
+      
+      <!-- 秋季黑白 -->
+      <div class="background-layer" id="bg-autumn-bw">
+        <img src="./01_图片素材/05_秋季_黑白.png" alt="秋季黑白">
+      </div>
+      
+      <!-- 秋季彩色 -->
+      <div class="background-layer" id="bg-autumn-color">
+        <img src="./01_图片素材/06_秋季_彩色.png" alt="秋季彩色">
+      </div>
+      
+      <!-- 秋季绽放视频 -->
+      <div class="background-layer" id="bg-autumn-video">
+        <video src="./02_视频素材/03_秋季绽放.mp4" loop muted playsinline></video>
+      </div>
+      
+      <!-- 冬季黑白 -->
+      <div class="background-layer" id="bg-winter-bw">
+        <img src="./01_图片素材/07_冬季_黑白.png" alt="冬季黑白">
+      </div>
+      
+      <!-- 冬季彩色 -->
+      <div class="background-layer" id="bg-winter-color">
+        <img src="./01_图片素材/08_冬季_彩色.png" alt="冬季彩色">
+      </div>
+      
+      <!-- 冬季绽放视频 -->
+      <div class="background-layer" id="bg-winter-video">
+        <video src="./02_视频素材/04_冬季绽放.mp4" loop muted playsinline></video>
+      </div>
+      
+      <!-- 现场照片轮播 -->
+      <div class="background-layer" id="bg-photos">
+        <div class="photo-carousel" id="photoCarousel">
+          <div class="photo-item active">
+            <img src="./04_现场布展素材/现场照片_01.jpg" alt="现场照片1">
+          </div>
+          <div class="photo-item">
+            <img src="./04_现场布展素材/现场照片_02.jpg" alt="现场照片2">
+          </div>
+          <div class="photo-item">
+            <img src="./04_现场布展素材/现场照片_03.jpg" alt="现场照片3">
+          </div>
+          <div class="photo-item">
+            <img src="./04_现场布展素材/现场照片_04.jpg" alt="现场照片4">
+          </div>
+          <div class="photo-item">
+            <img src="./04_现场布展素材/现场照片_05.jpg" alt="现场照片5">
+          </div>
+          <div class="photo-item">
+            <img src="./04_现场布展素材/现场照片_06.jpg" alt="现场照片6">
+          </div>
+          <div class="photo-item">
+            <img src="./04_现场布展素材/现场照片_07.jpg" alt="现场照片7">
+          </div>
+          <div class="photo-item">
+            <img src="./04_现场布展素材/现场照片_08.jpg" alt="现场照片8">
+          </div>
+        </div>
+      </div>
+      
+      <!-- 结尾 -->
+      <div class="background-layer" id="bg-ending">
+        <div class="ending-title">
+          <div class="main-title">墨 · 生</div>
+          <div class="sub-title">感谢观看</div>
+          <div class="sub-title-en">Thank You for Watching</div>
+          <div class="team-info">
+            Interactive Ink Installation<br>
+            2026
+          </div>
+        </div>
+      </div>
+      
+      <!-- 背景音乐 -->
+      <audio id="bgMusic" loop>
+        <source src="./05_音效素材/墨醒灵境_主背景音乐.mp3" type="audio/mpeg">
+      </audio>
+      
+      <div class="preview-overlay"></div>
+    </div>
+    
+    <!-- 预览区信息 -->
+    <div class="preview-info">
+      <div class="time-display" id="timeDisplay">
+        00:00<span class="ms">.00</span>
+      </div>
+      <div class="section-badge" id="sectionBadge">开场</div>
+    </div>
+    
+    <!-- 当前台词 -->
+    <div class="current-script" id="currentScript">
+      <div class="speaker-name">准备开始</div>
+      <div class="script-text">点击「播放」开始录制</div>
+      <div class="script-text next">人未动，画为静；人一动，墨生色</div>
+    </div>
+  </div>
+  
+  <!-- 右侧：控制面板 -->
+  <div class="control-section">
+    <div class="control-header">
+      <div class="control-title">《墨·生》背景播放器</div>
+      <div class="control-subtitle">3分钟完整版 · 录屏专用</div>
+    </div>
+    
+    <div class="play-controls">
+      <div class="main-buttons">
+        <button class="btn btn-primary" id="playBtn" onclick="togglePlay()">▶ 播放</button>
+        <button class="btn btn-secondary" onclick="resetTime()">⏮ 重置</button>
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar" onclick="seekProgress(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="time-labels">
+          <span id="currentTimeLabel">0:00</span>
+          <span>3:00</span>
+        </div>
+      </div>
+      
+      <div class="speed-control">
+        <label>速度：</label>
+        <div class="speed-btns">
+          <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
+          <button class="speed-btn" onclick="setSpeed(1)">1x</button>
+          <button class="speed-btn active" onclick="setSpeed(1.1)">1.1x</button>
+          <button class="speed-btn" onclick="setSpeed(1.25)">1.25x</button>
+          <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
+        </div>
+      </div>
+      
+      <div class="mode-toggle">
+        <label>
+          <input type="checkbox" id="pureBgMode" onchange="togglePureBgMode()">
+          <span>🎬 纯背景模式（隐藏台词，录屏用）</span>
+        </label>
+      </div>
+      
+      <div class="volume-control">
+        <label>🔊 音量</label>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="60" oninput="setVolume(this.value)">
+        <span class="volume-value" id="volumeValue">60%</span>
+      </div>
+    </div>
+    
+    <div class="notice">
+      <b>💡 录屏说明：</b><br>
+      1. 勾选「纯背景模式」隐藏台词<br>
+      2. 按 F 键全屏左侧预览区<br>
+      3. 点击播放，用录屏软件录制<br>
+      4. 得到3分钟完整背景视频
+    </div>
+    
+    <div class="timeline-section">
+      <div class="timeline-title">时间线（点击跳转）</div>
+      <div id="timeline">
+        <!-- 由JS生成 -->
+      </div>
+    </div>
+    
+    <div class="shortcuts">
+      <b>快捷键：</b><br>
+      <kbd>空格</kbd> 播放/暂停 &nbsp;&nbsp;
+      <kbd>R</kbd> 重置<br>
+      <kbd>←</kbd><kbd>→</kbd> 快退/快进5秒<br>
+      <kbd>↑</kbd><kbd>↓</kbd> 调整速度 &nbsp;&nbsp;
+      <kbd>F</kbd> 全屏<br>
+      <kbd>H</kbd> 显示/隐藏台词
+    </div>
+  </div>
+</div>
+
+<script>
+// 总时长（秒）- 3分钟
+const TOTAL_DURATION = 180;
+
+// 当前状态
+let currentTime = 0;
+let isPlaying = false;
+let playSpeed = 1.1;
+let timer = null;
+let photoTimer = null;
+let currentPhotoIndex = 0;
+let pureBgMode = false;
+let bgMusic = null;
+
+// 时间线数据 - 3分钟完整版（中英双语）
+const timeline = [
+  {
+    start: 0, end: 20,
+    title: "开场",
+    desc: "标题 + 核心理念",
+    bg: "opening",
+    speaker: "",
+    scripts: [
+      { time: 0, text: "墨 · 生", en: "Ink · Life" },
+      { time: 5, text: "交互水墨投影装置", en: "Interactive Ink Installation" },
+      { time: 10, text: "人未动，画为静", en: "When man is still, the painting is silent" },
+      { time: 15, text: "人一动，墨生色", en: "When man moves, ink blooms with color" }
+    ]
+  },
+  {
+    start: 20, end: 55,
+    title: "项目立意",
+    desc: "成员1 · 艺术总监",
+    bg: "spring-bw",
+    speaker: "成员1 · 艺术总监",
+    speakerEn: "Member 1 · Art Director",
+    scripts: [
+      { time: 20, text: "大家好，我是《墨·生》的主创。", en: "Hello everyone, I'm the creator of Ink · Life." },
+      { time: 25, text: "这个作品的灵感，来自吴冠中先生说的——", en: "This work is inspired by Mr. Wu Guanzhong's words:" },
+      { time: 30, text: "「动与静，是东方美学的永恒命题」。", en: "\"Motion and stillness are eternal themes of Eastern aesthetics.\"" },
+      { time: 35, text: "我们想做一件事：让一幅静止的水墨画，", en: "We wanted to make a static ink painting" },
+      { time: 40, text: "因为人的存在而活过来。", en: "come alive through human presence." },
+      { time: 44, text: "人未动时，画是静的，素墨留白，", en: "When you're still, the painting is quiet — plain ink, empty space," },
+      { time: 48, text: "像千百年里无人惊扰的山水；", en: "like a landscape undisturbed for centuries." },
+      { time: 52, text: "人一动，墨就生了色，像春天破冰...", en: "When you move, ink blooms with color — like spring breaking ice..." }
+    ]
+  },
+  {
+    start: 55, end: 95,
+    title: "技术特点",
+    desc: "成员2 · 技术负责人",
+    bg: "spring-color",
+    speaker: "成员2 · 技术负责人",
+    speakerEn: "Member 2 · Tech Lead",
+    scripts: [
+      { time: 55, text: "我来给大家拆解《墨·生》背后的技术逻辑。", en: "Let me break down the technology behind Ink · Life." },
+      { time: 60, text: "整套系统基于 TouchDesigner 实时渲染引擎搭建。", en: "Built entirely on the TouchDesigner real-time rendering engine." },
+      { time: 65, text: "最核心的是三层结构：", en: "At its core are three layers:" },
+      { time: 68, text: "第一层，Optical Flow 光流算法，", en: "Layer 1: Optical Flow algorithm," },
+      { time: 72, text: "实时捕捉摄像头前的人体动作，", en: "captures human motion in real-time from camera," },
+      { time: 76, text: "把运动轨迹转成黑白蒙版；", en: "converting movement into black & white masks." },
+      { time: 80, text: "第二层，是双层画面叠加——", en: "Layer 2: Dual-layer compositing —" },
+      { time: 84, text: "上层黑白水墨，下层重彩工笔，", en: "top layer B&W ink, bottom layer heavy-color gongbi," },
+      { time: 88, text: "蒙版在哪里，哪里的彩色就透出来；", en: "wherever the mask is, color shines through." },
+      { time: 92, text: "第三层，Feedback 反馈循环模拟晕染质感。", en: "Layer 3: Feedback loop simulates ink bleeding texture." }
+    ]
+  },
+  {
+    start: 95, end: 115,
+    title: "四季互动·春夏",
+    desc: "成员3 · 春夏篇",
+    bg: "spring-video",
+    speaker: "成员3 · 春夏篇",
+    speakerEn: "Member 3 · Spring & Summer",
+    scripts: [
+      { time: 95, text: "当你持续互动，让整幅画完全显色后，", en: "When you keep interacting and the painting fully reveals color," },
+      { time: 100, text: "就会触发当季的「绽放」。", en: "it triggers the season's \"Bloom\"." },
+      { time: 104, text: "春天，是柳叶随风飘落，疏朗灵动，", en: "Spring: willow leaves drifting in wind, light and graceful," },
+      { time: 108, text: "像江南三月的风；", en: "like March breeze in Jiangnan." },
+      { time: 111, text: "夏天，荷瓣从水面缓缓上浮...", en: "Summer: lotus petals slowly rising from water..." }
+    ]
+  },
+  {
+    start: 115, end: 135,
+    title: "四季互动·秋冬",
+    desc: "成员4 · 秋冬篇",
+    bg: "autumn-video",
+    speaker: "成员4 · 秋冬篇",
+    speakerEn: "Member 4 · Autumn & Winter",
+    scripts: [
+      { time: 115, text: "金色辉光从花心漾开，是盛夏最热烈的那一刻。", en: "golden glow rippling outward — midsummer's peak moment." },
+      { time: 120, text: "秋天，红枫漫天飞舞，金尘点点，", en: "Autumn: red maples dancing across sky, golden dust floating," },
+      { time: 124, text: "是暮色里的温柔；", en: "the tenderness of twilight." },
+      { time: 127, text: "冬天，雪花静静落下，", en: "Winter: snowflakes falling quietly," },
+      { time: 130, text: "素白渐渐覆盖画面，", en: "pure white gradually covering the canvas," },
+      { time: 133, text: "又回到最初的宁静。", en: "returning to original tranquility." }
+    ]
+  },
+  {
+    start: 135, end: 165,
+    title: "现场布展",
+    desc: "照片轮播 + 画外音",
+    bg: "photos",
+    speaker: "画外音",
+    speakerEn: "Voiceover",
+    scripts: [
+      { time: 135, text: "四季轮回，就像一场又一场的相遇。", en: "Four seasons cycle, like encounter after encounter." },
+      { time: 140, text: "你来过，画就记得。", en: "You've been here — and the painting remembers." },
+      { time: 145, text: "《墨·生》——", en: "Ink · Life —" },
+      { time: 150, text: "一幅等你来唤醒的水墨画。", en: "an ink painting waiting for you to awaken." },
+      { time: 155, text: "人未动，画为静；", en: "When man is still, the painting is silent;" },
+      { time: 160, text: "人一动，墨生色，画成境。", en: "when man moves, ink blooms, and the painting becomes a realm." }
+    ]
+  },
+  {
+    start: 165, end: 180,
+    title: "结尾",
+    desc: "团队信息 + 致谢",
+    bg: "ending",
+    speaker: "",
+    scripts: [
+      { time: 165, text: "墨 · 生", en: "Ink · Life" },
+      { time: 170, text: "Interactive Ink Installation", en: "Interactive Ink Installation" },
+      { time: 175, text: "感谢观看", en: "Thank you for watching" }
+    ]
+  }
+];
+
+// 格式化时间
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 100);
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+}
+
+function formatTimeSimple(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${String(secs).padStart(2, '0')}`;
+}
+
+// 获取当前段落
+function getCurrentSection() {
+  for (let i = 0; i < timeline.length; i++) {
+    if (currentTime >= timeline[i].start && currentTime < timeline[i].end) {
+      return { section: timeline[i], index: i };
+    }
+  }
+  return { section: timeline[timeline.length - 1], index: timeline.length - 1 };
+}
+
+// 切换背景
+function switchBackground(bgId) {
+  document.querySelectorAll('.background-layer').forEach(layer => {
+    layer.classList.remove('active');
+    const video = layer.querySelector('video');
+    if (video) video.pause();
+  });
+  
+  const target = document.getElementById('bg-' + bgId);
+  if (target) {
+    target.classList.add('active');
+    const video = target.querySelector('video');
+    if (video && isPlaying) {
+      video.play().catch(() => {});
+    }
+  }
+  
+  // 如果是照片轮播，启动轮播
+  if (bgId === 'photos') {
+    startPhotoCarousel();
+  } else {
+    stopPhotoCarousel();
+  }
+}
+
+// 照片轮播
+function startPhotoCarousel() {
+  stopPhotoCarousel();
+  const photos = document.querySelectorAll('#photoCarousel .photo-item');
+  const photoDuration = 4000; // 每张4秒
+  
+  photoTimer = setInterval(() => {
+    photos[currentPhotoIndex].classList.remove('active');
+    currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+    photos[currentPhotoIndex].classList.add('active');
+  }, photoDuration);
+}
+
+function stopPhotoCarousel() {
+  if (photoTimer) {
+    clearInterval(photoTimer);
+    photoTimer = null;
+  }
+}
+
+// 更新显示
+function updateDisplay() {
+  const { section, index } = getCurrentSection();
+  
+  // 更新时间
+  document.getElementById('timeDisplay').innerHTML = 
+    formatTime(currentTime).replace('.', '<span class="ms">.') + '</span>';
+  document.getElementById('currentTimeLabel').textContent = formatTimeSimple(currentTime);
+  
+  // 更新进度条
+  const progress = (currentTime / TOTAL_DURATION) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  
+  // 更新段落标签
+  document.getElementById('sectionBadge').textContent = section.title;
+  
+  // 更新背景
+  switchBackground(section.bg);
+  
+  // 更新台词
+  if (!pureBgMode) {
+    updateScript(section);
+  }
+  
+  // 更新时间线
+  updateTimelineHighlight(index);
+}
+
+// 更新台词
+function updateScript(section) {
+  const scripts = section.scripts;
+  let currentIdx = 0;
+  
+  for (let i = 0; i < scripts.length; i++) {
+    if (currentTime >= scripts[i].time) {
+      currentIdx = i;
+    }
+  }
+  
+  const currentText = scripts[currentIdx]?.text || '';
+  const currentEn = scripts[currentIdx]?.en || '';
+  const nextText = scripts[currentIdx + 1]?.text || '';
+  const nextEn = scripts[currentIdx + 1]?.en || '';
+  
+  const speakerEn = section.speakerEn || '';
+  
+  document.getElementById('currentScript').innerHTML = `
+    <div class="speaker-name">${section.speaker || ''}${speakerEn ? ' · ' + speakerEn : ''}</div>
+    <div class="script-text">${currentText}</div>
+    ${currentEn ? `<div class="script-text en">${currentEn}</div>` : ''}
+    ${nextText ? `<div class="script-text next">${nextText}</div>` : ''}
+    ${nextEn ? `<div class="script-text next en">${nextEn}</div>` : ''}
+  `;
+}
+
+// 生成时间线
+function generateTimeline() {
+  const container = document.getElementById('timeline');
+  let html = '';
+  
+  timeline.forEach((item, index) => {
+    html += `
+      <div class="timeline-item" id="tl-${index}" onclick="jumpTo(${item.start})">
+        <div class="timeline-time">${formatTimeSimple(item.start)}</div>
+        <div class="timeline-content">
+          <div class="timeline-name">${item.title}</div>
+          <div class="timeline-desc">${item.desc}</div>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// 更新时间线高亮
+function updateTimelineHighlight(activeIndex) {
+  document.querySelectorAll('.timeline-item').forEach((item, i) => {
+    item.classList.toggle('active', i === activeIndex);
+  });
+}
+
+// 播放/暂停
+function togglePlay() {
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('playBtn');
+  
+  if (isPlaying) {
+    btn.textContent = '⏸ 暂停';
+    startTimer();
+    playCurrentVideo();
+    playBgMusic();
+  } else {
+    btn.textContent = '▶ 播放';
+    stopTimer();
+    pauseAllVideos();
+    pauseBgMusic();
+  }
+}
+
+function startTimer() {
+  stopTimer();
+  const interval = 50;
+  
+  timer = setInterval(() => {
+    currentTime += (playSpeed * interval) / 1000;
+    
+    if (currentTime >= TOTAL_DURATION) {
+      currentTime = TOTAL_DURATION;
+      isPlaying = false;
+      document.getElementById('playBtn').textContent = '▶ 播放';
+      stopTimer();
+      pauseAllVideos();
+      stopPhotoCarousel();
+      pauseBgMusic();
+    }
+    
+    updateDisplay();
+  }, interval);
+}
+
+function stopTimer() {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+}
+
+function playCurrentVideo() {
+  const { section } = getCurrentSection();
+  const bg = document.getElementById('bg-' + section.bg);
+  if (bg) {
+    const video = bg.querySelector('video');
+    if (video) video.play().catch(() => {});
+  }
+}
+
+function pauseAllVideos() {
+  document.querySelectorAll('video').forEach(v => v.pause());
+}
+
+// 背景音乐控制
+function playBgMusic() {
+  if (!bgMusic) bgMusic = document.getElementById('bgMusic');
+  if (bgMusic) {
+    bgMusic.play().catch(e => console.log('音乐播放需要用户交互:', e));
+  }
+}
+
+function pauseBgMusic() {
+  if (bgMusic && bgMusic.pause) {
+    bgMusic.pause();
+  }
+}
+
+function syncBgMusicTime() {
+  if (!bgMusic) bgMusic = document.getElementById('bgMusic');
+  if (bgMusic && bgMusic.duration) {
+    // 音乐循环播放，根据当前时间计算音乐位置
+    const musicTime = currentTime % bgMusic.duration;
+    bgMusic.currentTime = musicTime;
+  }
+}
+
+function setVolume(value) {
+  if (!bgMusic) bgMusic = document.getElementById('bgMusic');
+  const volume = value / 100;
+  if (bgMusic) {
+    bgMusic.volume = volume;
+  }
+  document.getElementById('volumeValue').textContent = value + '%';
+}
+
+// 重置
+function resetTime() {
+  currentTime = 0;
+  isPlaying = false;
+  currentPhotoIndex = 0;
+  document.getElementById('playBtn').textContent = '▶ 播放';
+  stopTimer();
+  pauseAllVideos();
+  stopPhotoCarousel();
+  pauseBgMusic();
+  if (bgMusic) bgMusic.currentTime = 0;
+  
+  // 重置照片轮播
+  const photos = document.querySelectorAll('#photoCarousel .photo-item');
+  photos.forEach((p, i) => p.classList.toggle('active', i === 0));
+  
+  updateDisplay();
+}
+
+// 跳转
+function jumpTo(seconds) {
+  currentTime = seconds;
+  
+  // 同步音乐
+  syncBgMusicTime();
+  
+  // 如果跳转到照片段落，重置照片索引
+  const { section } = getCurrentSection();
+  if (section.bg === 'photos') {
+    const elapsed = currentTime - section.start;
+    currentPhotoIndex = Math.floor(elapsed / 4) % 8;
+    const photos = document.querySelectorAll('#photoCarousel .photo-item');
+    photos.forEach((p, i) => p.classList.toggle('active', i === currentPhotoIndex));
+  }
+  
+  updateDisplay();
+  if (isPlaying) {
+    playCurrentVideo();
+  }
+}
+
+// 进度条点击
+function seekProgress(event) {
+  const bar = document.getElementById('progressBar');
+  const rect = bar.getBoundingClientRect();
+  const percent = (event.clientX - rect.left) / rect.width;
+  currentTime = percent * TOTAL_DURATION;
+  updateDisplay();
+  if (isPlaying) playCurrentVideo();
+}
+
+// 速度
+function setSpeed(speed) {
+  playSpeed = speed;
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.toggle('active', parseFloat(btn.textContent) === speed);
+  });
+  
+  // 同步音乐播放速度
+  if (!bgMusic) bgMusic = document.getElementById('bgMusic');
+  if (bgMusic) {
+    bgMusic.playbackRate = speed;
+  }
+  
+  // 同步视频播放速度
+  document.querySelectorAll('video').forEach(v => {
+    v.playbackRate = speed;
+  });
+}
+
+// 纯背景模式切换
+function togglePureBgMode() {
+  pureBgMode = document.getElementById('pureBgMode').checked;
+  const scriptEl = document.getElementById('currentScript');
+  
+  if (pureBgMode) {
+    scriptEl.classList.add('hidden');
+  } else {
+    scriptEl.classList.remove('hidden');
+    const { section } = getCurrentSection();
+    updateScript(section);
+  }
+}
+
+// 全屏
+function toggleFullscreen() {
+  const preview = document.querySelector('.preview-section');
+  if (!document.fullscreenElement) {
+    preview.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// 键盘快捷键
+document.addEventListener('keydown', (e) => {
+  switch(e.code) {
+    case 'Space':
+      e.preventDefault();
+      togglePlay();
+      break;
+    case 'KeyR':
+      resetTime();
+      break;
+    case 'ArrowLeft':
+      currentTime = Math.max(0, currentTime - 5);
+      updateDisplay();
+      if (isPlaying) playCurrentVideo();
+      break;
+    case 'ArrowRight':
+      currentTime = Math.min(TOTAL_DURATION, currentTime + 5);
+      updateDisplay();
+      if (isPlaying) playCurrentVideo();
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      playSpeed = Math.min(2, playSpeed + 0.25);
+      updateSpeedButtons();
+      break;
+    case 'ArrowDown':
+      e.preventDefault();
+      playSpeed = Math.max(0.25, playSpeed - 0.25);
+      updateSpeedButtons();
+      break;
+    case 'KeyF':
+      toggleFullscreen();
+      break;
+    case 'KeyH':
+      document.getElementById('pureBgMode').checked = !document.getElementById('pureBgMode').checked;
+      togglePureBgMode();
+      break;
+  }
+});
+
+function updateSpeedButtons() {
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.toggle('active', parseFloat(btn.textContent) === playSpeed);
+  });
+}
+
+// 初始化
+generateTimeline();
+updateDisplay();
+setVolume(60);
+setSpeed(playSpeed);
+</script>
+</body>
+</html>

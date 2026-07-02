@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>墨·生 — 现场操作提示</title>
+<style>
+  :root{
+    --ink:#23201c; --ink2:#4a443c; --paper:#f3ecdd; --paper2:#ece2cd;
+    --seal:#b23a2e; --seal2:#9c3326; --gold:#b8893b;
+    --spring:#6ea05a; --summer:#c85a7a; --autumn:#cf6a2a; --winter:#5f7fa6;
+    --line:#cdbfa4;
+  }
+  *{box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  @page{ size:A4; margin:10mm; }
+  html,body{margin:0;padding:0;background:#ddd;}
+  body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; color:var(--ink);}
+  .sheet{
+    width:210mm; min-height:297mm; margin:0 auto; background:var(--paper);
+    background-image:radial-gradient(circle at 20% 10%, #fff7e9 0%, transparent 40%),
+                     radial-gradient(circle at 85% 90%, #efe4cd 0%, transparent 45%);
+    padding:11mm 12mm; position:relative;
+  }
+  .hd{display:flex; align-items:flex-end; justify-content:space-between;
+      border-bottom:2.5px solid var(--ink); padding-bottom:5px;}
+  .title{font-size:30px; font-weight:800; letter-spacing:6px;}
+  .title .seal{display:inline-block; background:var(--seal); color:#f7eee0; border-radius:4px;
+      padding:0 8px; margin-right:8px; transform:translateY(-2px);}
+  .sub{font-size:12px; color:var(--ink2); letter-spacing:1px; text-align:right; line-height:1.5;}
+  .concept{font-size:12.5px; color:var(--seal2); margin:7px 0 10px; letter-spacing:1.5px; font-style:italic;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .card{background:rgba(255,255,255,.55); border:1px solid #d9ccae; border-radius:8px; padding:9px 11px;}
+  .card.full{grid-column:1 / span 2;}
+  .ch{display:flex; align-items:center; gap:7px; font-size:14px; font-weight:800; margin:0 0 5px;}
+  .num{display:inline-flex; width:20px; height:20px; border-radius:50%; background:var(--ink); color:var(--paper);
+       align-items:center; justify-content:center; font-size:12px; font-weight:700;}
+  ol,ul{margin:3px 0 0; padding-left:18px;}
+  li{font-size:11.7px; line-height:1.62; margin:1px 0;}
+  b{color:var(--seal2);}
+  code{background:#efe6d2; border:1px solid #ddd0b4; border-radius:3px; padding:0 4px; font-size:10.8px;
+       font-family:"SFMono-Regular",Consolas,monospace; color:#5a4a2a;}
+  .seasons{display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:4px;}
+  .se{border-radius:7px; padding:7px 8px; color:#fff;}
+  .se h4{margin:0 0 2px; font-size:13px; letter-spacing:2px;}
+  .se p{margin:0; font-size:10.6px; line-height:1.45; opacity:.96;}
+  .sp{background:var(--spring)} .su{background:var(--summer)} .au{background:var(--autumn)} .wi{background:var(--winter)}
+  table{width:100%; border-collapse:collapse; margin-top:3px;}
+  td,th{border-bottom:1px solid #ddd0b4; padding:3px 5px; font-size:11px; text-align:left; vertical-align:top;}
+  th{color:var(--ink2); font-weight:700; border-bottom:1.5px solid #b9a980;}
+  .knob{color:var(--gold); font-weight:700;}
+  .foot{margin-top:9px; border-top:2px solid var(--ink); padding-top:6px;
+        display:flex; justify-content:space-between; font-size:10.5px; color:var(--ink2);}
+  .tip{background:#fbf4e3; border-left:3px solid var(--gold); padding:6px 9px; border-radius:4px; margin-top:4px;}
+  .tip b{color:var(--gold);}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="hd">
+    <div class="title"><span class="seal">墨</span>生 · 现场操作提示</div>
+    <div class="sub">交互水墨投影装置 / Interactive Ink Installation<br>输出 1280×720 · 16:9 · 无黑边</div>
+  </div>
+  <div class="concept">人未动，画为静；人一动，墨生色，画成境。 —— 以吴冠中「动与静」为内核</div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="ch"><span class="num">1</span>启动</div>
+      <ol>
+        <li>打开 <b>TouchDesigner</b> → 打开最新 <code>mosheng_pipeline_…10.toe</code></li>
+        <li>等待加载；<b>前 4 秒</b>为冷启动保护，画面先呈纯黑白水墨</li>
+        <li>确认右上角 <b>FPS ≥ 30</b>、<code>Realtime</code> 勾选</li>
+        <li>接好<b>摄像头</b>：放在观众前方，<b>切勿正对投影画面</b></li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="num">2</span>全屏投影（只显示画面）</div>
+      <ol>
+        <li>HDMI 接显示器/投影，系统显示设为<b>「扩展」</b>(非镜像)，分辨率 <b>1920×1080</b></li>
+        <li>选中 <code>HDMI_fullscreen_output</code>，Display=<b>1</b>(外接屏)</li>
+        <li>切到 <b>Open/Close</b> 标签 → 点 <b>Open</b>（或按 <code>F1</code>）</li>
+        <li>第二屏即无边框全屏，<b>无菜单/无光标</b>；退出按 <code>Esc</code></li>
+      </ol>
+    </div>
+
+    <div class="card full">
+      <div class="ch"><span class="num">3</span>观众互动方式</div>
+      <ul>
+        <li>静止时：画面是<b>素净黑白水墨</b>。观众在摄像头前<b>挥手</b> → 挥过之处<b>「墨生色」</b>(黑白→彩色)，<b>颜色会保留</b>。</li>
+        <li>持续互动让画面<b>完全显色</b> → 触发<b>当季「绽放」</b>动画(见下)，约 5 秒后优雅淡出 → <b>自动进入下一季</b>，从黑白重新开始。</li>
+        <li>声音：背景古乐《墨醒灵境》＋季节环境音；挥手伴极淡墨响。大动作显色更快更浓，小动作细腻。</li>
+      </ul>
+    </div>
+
+    <div class="card full">
+      <div class="ch"><span class="num">4</span>四季绽放（完全显色时触发）</div>
+      <div class="seasons">
+        <div class="se sp"><h4>春</h4><p>柳叶轻盈飘落，疏朗灵动</p></div>
+        <div class="se su"><h4>夏</h4><p>荷瓣上浮，金色绽放辉光</p></div>
+        <div class="se au"><h4>秋</h4><p>枫叶纷飞铺洒，金尘点点</p></div>
+        <div class="se wi"><h4>冬</h4><p>雪花飘落，素白渐覆画面</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="num">5</span>现场微调旋钮</div>
+      <table>
+        <tr><th>想要</th><th>调这里</th></tr>
+        <tr><td>更易/更难显色</td><td><span class="knob">01…/threshold_motion</span> 降/升</td></tr>
+        <tr><td>显色更浓</td><td><span class="knob">level_immediate_motion_brush</span> · brightness1 ↑</td></tr>
+        <tr><td>绽放开/关</td><td><span class="knob">09_season_payoff</span> · Payoffenable</td></tr>
+        <tr><td>音量</td><td><span class="knob">04_audio_reactivity</span> 内各 gain</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="num">6</span>排错与保底</div>
+      <ul>
+        <li><b>不显色</b>：看摄像头是否被挡/太暗；调低 <code>threshold_motion</code>。</li>
+        <li><b>一直乱显色</b>：环境太亮/晃动；调高 <code>threshold_motion</code>。</li>
+        <li><b>卡顿掉帧</b>：关 <code>06 Waterenable</code>、<code>09 Payoffenable</code>。</li>
+        <li><b>画面异常</b>：<code>File ▸ Revert</code> 或重开 .toe。</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="tip"><b>打印提示</b>：浏览器打印时请勾选「<b>背景图形 / Background graphics</b>」才能印出彩色底色；纸张选 A4、缩放 100%、边距「默认」。</div>
+
+  <div class="foot">
+    <div>投影输出 TOP：<code>/mosheng_project/07_grade_and_frame/OUT_final_projection_graded</code></div>
+    <div>《墨·生》 · TouchDesigner 交互装置</div>
+  </div>
+
+</div>
+</body>
+</html>
