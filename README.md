@@ -115,9 +115,10 @@
 
 ---
 
-## 团队
+## Contributors
 
-交互水墨投影装置作品
+- **0dot77 (Taeyang Yoo)** — `td-cli` original author, original CLI architecture and base implementation
+- **MotWang** — `《墨·生》` project author, TD interactive artwork design/production, and project-specific CLI optimization/integration
 
 ---
 
@@ -132,17 +133,26 @@
 
 ---
 
-## My Contribution（我的优化贡献）
+## Contribution Boundary（贡献边界说明）
 
-相对最初下载的原版 CLI，我完成了以下优化：
+### Original CLI Author Contribution
 
-- 增加面向 Agent 的 Harness 工作流（observe/apply/verify/history/rollback）
-- 修复并增强核心稳定性（disconnect、ops delete、docs/timeline、verify 输出等）
-- 优化 FeedbackTOP 使用模式，降低 cook-loop 与错误回路风险
+- `td-cli` 基础架构与核心命令系统由 **0dot77 (Taeyang Yoo)** 原创
+- 原始仓库与基础能力来源于上游 `td-cli` 项目
+
+### MotWang Contribution（《墨·生》作者）
+
+- 将 CLI 深度应用于《墨·生》交互装置生产流程，并完成工程化落地
+- 增加/强化面向 Agent 的工作闭环（observe/apply/verify/history/rollback）
+- 修复并增强稳定性（disconnect、ops delete、docs/timeline、verify 输出等）
+- 优化 FeedbackTOP 用法与回路安全性，降低 cook-loop 风险
 - 增强 ripple/ink 视觉链路（扩散、噪声扰动、显色复合、RGB 爆色抑制）
-- 补全可落地文档与实操说明（artist + agent 双工作流）
+- 补全运行文档、项目资产组织与 macOS 实操说明
 
-以上优化的代码与文档已随仓库上传。
+### Repository Attribution Note
+
+- 本仓库中的 `Code_runtime_cli/` 为《墨·生》项目运行快照与优化集成版本
+- 该目录保留并尊重原 CLI 作者署名，同时明确 Mosheng 项目侧二次开发贡献
 
 ---
 
