@@ -117,7 +117,6 @@
 
 ## Contributors
 
-- **0dot77 (Taeyang Yoo)** — `td-cli` original author, original CLI architecture and base implementation
 - **MotWang** — `《墨·生》` project author, TD interactive artwork design/production, and project-specific CLI optimization/integration
 
 ---
