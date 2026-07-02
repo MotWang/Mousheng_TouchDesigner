@@ -1,0 +1,29 @@
+# Binaries
+td-cli.exe
+/td-cli
+dist/
+
+# Allow cmd/td-cli directory
+!cmd/
+
+# Raw docs (only slim embedded data is tracked)
+docs/operators/
+docs/python-api/
+docs/embed/
+
+# Temp
+/tmp/
+*.tmp
+
+# Claude Code local settings (machine-specific)
+.claude/settings.local.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+.omx/
+__pycache__/

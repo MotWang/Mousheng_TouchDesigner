@@ -121,4 +121,51 @@
 
 ---
 
+## 已上传运行代码与优化版 CLI
+
+为保证仓库可直接下载运行，同时不破坏本地 `Code` 原始仓库历史，本项目已提供：
+
+- `Code_runtime_cli/`：可直接查看与使用的运行代码快照（不含嵌套 `.git` 元数据）
+- 该目录包含你优化后的 CLI、TouchDesigner 脚本、工程文档与相关资产
+
+对应在线仓库：[`MotWang/Mousheng_TouchDesigner`](https://github.com/MotWang/Mousheng_TouchDesigner.git)
+
+---
+
+## My Contribution（我的优化贡献）
+
+相对最初下载的原版 CLI，我完成了以下优化：
+
+- 增加面向 Agent 的 Harness 工作流（observe/apply/verify/history/rollback）
+- 修复并增强核心稳定性（disconnect、ops delete、docs/timeline、verify 输出等）
+- 优化 FeedbackTOP 使用模式，降低 cook-loop 与错误回路风险
+- 增强 ripple/ink 视觉链路（扩散、噪声扰动、显色复合、RGB 爆色抑制）
+- 补全可落地文档与实操说明（artist + agent 双工作流）
+
+以上优化的代码与文档已随仓库上传。
+
+---
+
+## macOS 运行 TouchDesigner 与 CLI
+
+### 1) 运行 TouchDesigner 工程（Mac）
+
+- 安装并打开 TouchDesigner（macOS 版）
+- 打开工程：`Code_runtime_cli/mosheng_final.toe`（若该文件存在）或你的目标 `.toe`
+- 确认工程内 `TDCliServer` 已加载，默认端口为 `9500`
+
+### 2) 运行优化后的 CLI（Mac）
+
+- 进入目录：`Code_runtime_cli/`
+- 本地构建：`go build -o td-cli ./cmd/td-cli/`
+- 连接测试：`./td-cli status`
+
+### 3) 常用验证命令
+
+- `./td-cli instances`
+- `./td-cli ops list /project1 --depth 2`
+- `./td-cli screenshot /project1/<top_path> -o frame.png`
+
+---
+
 *© 2026 《墨·生》项目组*
